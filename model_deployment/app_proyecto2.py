@@ -4,7 +4,6 @@ from tensorflow.keras.models import load_model
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import pickle
-import os
 
 # Inicializar Flask y Flask-RESTX
 app = Flask(__name__, template_folder='.')
@@ -30,7 +29,7 @@ vectorizer_path = 'tfidf_vectorizer.pkl'
 with open(vectorizer_path, 'rb') as file:
     vectorizer = pickle.load(file)
 
-@ns.route('/')
+@ns.route('/predict')
 class MovieGenreApi(Resource):
     @api.expect(model_input)
     @api.response(200, 'Success')
