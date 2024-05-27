@@ -6,9 +6,9 @@ import numpy as np
 import pickle
 
 # Inicializar Flask y Flask-RESTX
-app = Flask(__name__, template_folder='.')
+app = Flask(__name__, template_folder='templates')
 api = Api(app, version='1.0', title='Movie Genre Classification API',
-          description='API para clasificar géneros de películas basado en el título y la sinopsis.', doc='/docs')  # Cambio aquí
+          description='API para clasificar géneros de películas basado en el título y la sinopsis.', doc='/docs')
 
 # Definir el namespace
 ns = api.namespace('predict', description='Predicción del modelo')
@@ -20,12 +20,12 @@ model_input = api.model('PredictionData', {
 })
 
 # Cargar el modelo de red neuronal entrenado y recompilarlo
-model_path = 'corrected_model.h5'
+model_path = 'model_deployment/corrected_model.h5'
 model = load_model(model_path)
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['AUC'])
 
 # Cargar el vectorizador TF-IDF
-vectorizer_path = 'tfidf_vectorizer.pkl'
+vectorizer_path = 'model_deployment/tfidf_vectorizer.pkl'
 with open(vectorizer_path, 'rb') as file:
     vectorizer = pickle.load(file)
 
