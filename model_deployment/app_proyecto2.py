@@ -4,9 +4,10 @@ from tensorflow.keras.models import load_model
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import pickle
+import os
 
 # Inicializar Flask y Flask-RESTX
-app = Flask(__name__, template_folder='.')
+app = Flask(__name__, template_folder='model_deployment')
 api = Api(app, version='1.0', title='Movie Genre Classification API',
           description='API para clasificar géneros de películas basado en el título y la sinopsis.', doc='/docs')  # Cambio aquí
 
@@ -20,12 +21,12 @@ model_input = api.model('PredictionData', {
 })
 
 # Cargar el modelo de red neuronal entrenado y recompilarlo
-model_path = 'corrected_model.h5'
+model_path = 'model_deployment/corrected_model.h5'
 model = load_model(model_path)
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['AUC'])
 
 # Cargar el vectorizador TF-IDF
-vectorizer_path = 'tfidf_vectorizer.pkl'
+vectorizer_path = 'model_deployment/tfidf_vectorizer.pkl'
 with open(vectorizer_path, 'rb') as file:
     vectorizer = pickle.load(file)
 
