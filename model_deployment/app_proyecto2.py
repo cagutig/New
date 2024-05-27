@@ -24,7 +24,7 @@ model_path = './corrected_model.h5'
 model = load_model(model_path)
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['AUC'])
 
-# Cargar el nuevo vectorizador TF-IDF
+# Cargar el vectorizador TF-IDF
 vectorizer_path = 'tfidf_vectorizer_new.pkl'
 with open(vectorizer_path, 'rb') as file:
     vectorizer = pickle.load(file)
