@@ -20,12 +20,12 @@ model_input = api.model('PredictionData', {
 })
 
 # Cargar el modelo de red neuronal entrenado y recompilarlo
-model_path = 'corrected_model.h5'  # Cambia esto a './corrected_model.h5' si es necesario
+model_path = './corrected_model.h5'
 model = load_model(model_path)
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['AUC'])
 
-# Cargar el vectorizador TF-IDF
-vectorizer_path = 'tfidf_vectorizer.pkl'
+# Cargar el nuevo vectorizador TF-IDF
+vectorizer_path = 'tfidf_vectorizer_new.pkl'
 with open(vectorizer_path, 'rb') as file:
     vectorizer = pickle.load(file)
 
@@ -38,11 +38,11 @@ class MovieGenreApi(Resource):
         title = data['title']
         plot = data['plot']
         title_plot = f"{title} {plot}"
-        
+
         input_data = vectorizer.transform([title_plot]).toarray()
         prediction = model.predict(input_data)
         prediction = prediction.tolist()
-        
+
         return jsonify({'prediction': prediction})
 
 @app.route('/')
