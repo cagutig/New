@@ -1,3 +1,4 @@
+# Importar librerías
 from flask import Flask, request, jsonify
 from flask_restx import Api, Resource, fields
 from tensorflow.keras.models import load_model
@@ -8,7 +9,7 @@ import pickle
 # Inicializar Flask y Flask-RESTX
 app = Flask(__name__)
 api = Api(app, version='1.0', title='Movie Genre Classification API',
-          description='API para clasificar géneros de películas basado en el título y la sinopsis.', doc='/docs')  # Cambio aquí
+          description='API para clasificar géneros de películas basado en el título y la sinopsis.')
 
 # Definir el namespace
 ns = api.namespace('predict', description='Predicción del modelo')
@@ -29,9 +30,12 @@ vectorizer_path = 'tfidf_vectorizer.pkl'
 with open(vectorizer_path, 'rb') as file:
     vectorizer = pickle.load(file)
 
-# Cargar los nombres de los géneros
-genre_names = ['Romance', 'Drama', 'Biography', 'Crime', 'Mystery', 'Horror', 'Sci-Fi', 'Action', 'Comedy', 'Adventure', 'Fantasy', 'Family', 'Music', 'Musical', 'War', 'Western', 'Animation', 'History', 'Sport', 'Documentary']
+# Lista de géneros
+genres = ['Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Family',
+          'Fantasy', 'Film-Noir', 'History', 'Horror', 'Music', 'Musical', 'Mystery', 'News', 'Romance',
+          'Sci-Fi', 'Short', 'Sport', 'Thriller', 'War', 'Western']
 
+# Definir la clase para la predicción
 @ns.route('/')
 class MovieGenreApi(Resource):
     @api.expect(model_input)
@@ -42,15 +46,21 @@ class MovieGenreApi(Resource):
         plot = data['plot']
         title_plot = f"{title} {plot}"
         
+        # Vectorizar el texto usando el vectorizador TF-IDF
         input_data = vectorizer.transform([title_plot]).toarray()
-        prediction = model.predict(input_data)
-        prediction = prediction.tolist()[0]
         
-        # Convertir las predicciones en un formato más legible
-        response = {genre: round(prob, 4) for genre, prob in zip(genre_names, prediction)}
+        # Hacer la predicción
+        prediction = model.predict(input_data)[0]
         
-        return jsonify({'prediction': response})
+        # Asociar las predicciones con los géneros
+        prediction_dict = {genre: float(pred) for genre, pred in zip(genres, prediction)}
+        
+        return jsonify({'prediction': prediction_dict})
+
+# Ruta para verificar el funcionamiento de la API
+@app.route('/')
+def home():
+    return "La API está funcionando correctamente."
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000)
-
