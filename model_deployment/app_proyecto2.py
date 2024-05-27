@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_restx import Api, Resource, fields
 from tensorflow.keras.models import load_model
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -6,9 +6,9 @@ import numpy as np
 import pickle
 
 # Inicializar Flask y Flask-RESTX
-app = Flask(__name__)
+app = Flask(__name__, template_folder='.')
 api = Api(app, version='1.0', title='Movie Genre Classification API',
-          description='API para clasificar géneros de películas basado en el título y la sinopsis.')
+          description='API para clasificar géneros de películas basado en el título y la sinopsis.', doc='/docs')
 
 # Definir el namespace
 ns = api.namespace('predict', description='Predicción del modelo')
@@ -29,6 +29,9 @@ vectorizer_path = 'tfidf_vectorizer.pkl'
 with open(vectorizer_path, 'rb') as file:
     vectorizer = pickle.load(file)
 
+# Cargar los nombres de los géneros
+genre_names = ['Romance', 'Drama', 'Biography', 'Crime', 'Mystery', 'Horror', 'Sci-Fi', 'Action', 'Comedy', 'Adventure', 'Fantasy', 'Family', 'Music', 'Musical', 'War', 'Western', 'Animation', 'History', 'Sport', 'Documentary']
+
 @ns.route('/')
 class MovieGenreApi(Resource):
     @api.expect(model_input)
@@ -41,9 +44,12 @@ class MovieGenreApi(Resource):
         
         input_data = vectorizer.transform([title_plot]).toarray()
         prediction = model.predict(input_data)
-        prediction = prediction.tolist()
+        prediction = prediction.tolist()[0]
         
-        return jsonify({'prediction': prediction})
+        # Convertir las predicciones en un formato más legible
+        response = {genre: round(prob, 4) for genre, prob in zip(genre_names, prediction)}
+        
+        return jsonify({'prediction': response})
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000)
