@@ -20,12 +20,12 @@ model_input = api.model('PredictionData', {
 })
 
 # Cargar el modelo de red neuronal entrenado y recompilarlo
-model_path = 'model_deployment/corrected_model.h5'
+model_path = 'corrected_model.h5'  # Cambia esto a './corrected_model.h5' si es necesario
 model = load_model(model_path)
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['AUC'])
 
 # Cargar el vectorizador TF-IDF
-vectorizer_path = 'model_deployment/tfidf_vectorizer.pkl'
+vectorizer_path = 'tfidf_vectorizer.pkl'
 with open(vectorizer_path, 'rb') as file:
     vectorizer = pickle.load(file)
 
@@ -51,4 +51,3 @@ def home():
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000)
-
