@@ -55,7 +55,7 @@ class MovieGenreApi(Resource):
         prediction_dict = {genre: round(float(pred), 4) for genre, pred in zip(genres, prediction)}
         
         # Ordenar las predicciones en orden descendente por valores numéricos
-        sorted_prediction = dict(sorted(prediction_dict.items(), key=lambda item: item[1], reverse=True))
+        sorted_prediction = {k: v for k, v in sorted(prediction_dict.items(), key=lambda item: item[1], reverse=True)}
         
         return jsonify({'prediction': sorted_prediction})
 
